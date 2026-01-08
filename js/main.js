@@ -15,7 +15,6 @@
   const replyTitle = $("#replyTitle");
   const replyBody = $("#replyBody");
 
-  // 필수 요소 체크 (버튼 먹통 방지)
   const required = [
     envelope, modalLetter, modalName, modalReply,
     btnOpenLetter, btnOpenInbox, btnCheckName,
