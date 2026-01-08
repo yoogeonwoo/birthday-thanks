@@ -65,7 +65,7 @@ btnOpenLetter.addEventListener("click", () => {
     const sc = document.querySelector("#modalLetter .paperScroll");
     if (sc) sc.scrollTop = 0;
     isAnimating = false;
-  }, 760);
+  }, 780);
 });
 
 btnOpenInbox.addEventListener("click", async () => {
