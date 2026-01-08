@@ -19,16 +19,15 @@
   --paperA: rgb(255, 252, 246);
   --paperB: rgb(244, 234, 219);
 
-  /* 편지지 */
   --letter: #E1BF72;
 
-  /* 봉투 */
-  --envBack: #FFFFFF;     /* 뒷 배경: 완전 흰색 */
+  --envBack: #FFFFFF;     /* 완전 흰색 */
   --envFlap: #EDE4D6;     /* 플랩 */
-
-  /* 겉표지(연한 톤 유지) */
   --envCoverTop: rgb(252, 247, 238);
   --envCoverBottom: rgb(244, 235, 222);
+
+  /* 플랩 틈 덮는 내피 */
+  --flapLiner: rgb(248, 242, 232);
 }
 
 *{ box-sizing:border-box; }
@@ -113,20 +112,15 @@ body{ font-family:var(--font); color:var(--ink); }
 }
 
 /* =========================
-   Envelope
-   레이어: back < letter < cover < flap
-   핵심: letter가 아래에서 보이는 현상은 envelope overflow로 차단
+   Envelope (오류 최소화 안전형)
    ========================= */
 
 .envelope{
   width:min(300px, 74vw);
   aspect-ratio: 4 / 3;
   position:relative;
-  perspective: 900px;
   filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
-
-  /* 핵심: 편지지가 “봉투 아래에서 시작해 보이는” 현상 구조적으로 차단 */
-  overflow:hidden;
+  overflow: visible;     /* 편지지가 밖으로 나올 수 있게 */
   border-radius:16px;
 }
 
@@ -138,9 +132,7 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:1;
 }
 
-/* 편지지: 시작점을 봉투 내부로 더 확실히 올림
-   - bottom을 조금 올리고
-   - translateY도 과도하게 아래로 내리지 않음 */
+/* 편지지: “봉투 안에서 시작”을 강하게 보정 */
 .env-letter{
   position:absolute;
   left:8%; right:8%;
@@ -148,245 +140,58 @@ body{ font-family:var(--font); color:var(--ink); }
   height:78%;
   border-radius:12px;
   border:1px solid rgba(92,66,30,0.22);
-  background:linear-gradient(180deg, var(--letter), var(--letter));
+  background: var(--letter);
+  pointer-events:none;
 
-  transform: translateY(22%);
+  /* 시작: 봉투 내부(아래에서 시작해 보이는 현상 완화) */
+  transform: translateY(10%);
   opacity:0;
 
   transition: transform 620ms ease, opacity 260ms ease;
-  pointer-events:none;
   z-index:2;
 }
 
 .env-front{
   position:absolute; inset:0;
   border-radius:16px;
-  overflow:hidden;
   pointer-events:none;
   z-index:3;
 }
 
-/* 겉표지 */
+/* 겉표지는 내부만 덮어야 하므로 클리핑은 cover에만 적용 */
 .env-cover{
   position:absolute; inset:0;
   border-radius:16px;
+  overflow:hidden;
   background:transparent;
 }
 
-/* 겉표지 V 라인:
-   - 꼭짓점을 “중앙보다 아주 조금 아래”로 (요청 반영)
-   - 선(양쪽->중앙) 내려오는 느낌을 하단으로 약간 이동 */
+/* 겉표지 V */
 .env-cover::after{
   content:"";
   position:absolute; inset:0;
   background:linear-gradient(180deg, var(--envCoverTop), var(--envCoverBottom));
   clip-path: polygon(
-    0 9%,
+    0 8%,
     50% 52%,
-    100% 9%,
+    100% 8%,
     100% 100%,
     0 100%
   );
-  border-top:1px solid rgba(92,66,30,0.20);
-  pointer-events:none;
+  border-top:1px solid rgba(92,66,30,0.18);
 }
 
-.env-cover::before{
-  content:"";
-  position:absolute; inset:0;
-  background:
-    linear-gradient(135deg, rgba(92,66,30,0.14), rgba(92,66,30,0) 35%),
-    linear-gradient(225deg, rgba(92,66,30,0.14), rgba(92,66,30,0) 35%);
-  clip-path: polygon(
-    0 9%,
-    50% 52%,
-    100% 9%,
-    100% 100%,
-    0 100%
-  );
-  opacity:0.55;
-  pointer-events:none;
-}
-
-/* 플랩:
-   - 크기 약간 키움
-   - 꼭짓점 각도 더 넓게(덜 뾰족) => 꼭짓점 y를 과도하게 내리지 않음
-   - 대신 flap 자체 높이를 약간 늘려 “덮는 느낌” 유지 */
+/* 플랩: 사라지지 않고 위로 올라가게 */
 .env-flap{
   position:absolute;
   left:0; right:0; top:0;
 
-  height:72%;
+  /* 플랩 크기 약간 키움 */
+  height:76%;
 
   transform-origin: 50% 0%;
-  transform: rotateX(0deg);
+  transform: translateY(0) rotate(0deg);
   transition: transform 520ms ease;
 
   background: var(--envFlap);
   border:1px solid rgba(92,66,30,0.28);
-
-  /* 꼭짓점 y를 90%처럼 극단적으로 내리면 뾰족해지므로,
-     조금 올려서 각도를 넓게(완만하게) */
-  clip-path: polygon(0 0, 100% 0, 50% 78%);
-
-  border-bottom:none;
-  border-radius:16px 16px 0 0;
-  pointer-events:none;
-  z-index:4;
-}
-
-/* Opening */
-.envelope.is-opening .env-flap{ transform: rotateX(-165deg); }
-.envelope.is-opening .env-letter{
-  transform: translateY(-12%);
-  opacity:1;
-}
-
-/* Modal */
-.modal{
-  position:fixed; inset:0;
-  display:none;
-  z-index:30;
-}
-.modal.is-open{ display:block; }
-
-.backdrop{
-  position:absolute; inset:0;
-  background:rgba(0,0,0,0.50);
-  opacity:0;
-  transition: opacity 220ms ease;
-}
-
-.panel{
-  position:relative;
-  width:min(900px, 94vw);
-  margin:6vh auto 0;
-  border-radius:18px;
-  border:1px solid var(--line);
-  box-shadow:0 18px 44px var(--shadow);
-  overflow:hidden;
-  background:linear-gradient(180deg, var(--paperA), var(--paperB));
-  transform: translateY(8px) scale(0.985);
-  opacity:0;
-  transition: transform 240ms ease, opacity 240ms ease;
-}
-
-.modal.is-open .backdrop{ opacity:1; }
-.modal.is-open .panel{ opacity:1; transform: translateY(0) scale(1); }
-
-.close{
-  position:absolute; top:10px; right:12px;
-  border:1px solid rgba(60,40,15,0.22);
-  background:rgba(255,255,255,0.58);
-  border-radius:10px;
-  cursor:pointer;
-  font-family:var(--font);
-  font-size:16px;
-  padding:6px 10px;
-  z-index:2;
-}
-
-/* Main letter image viewer */
-.paperPanel{ background:linear-gradient(180deg, var(--paperA), var(--paperB)); }
-
-.paperScroll{
-  padding:16px;
-  max-height: 82vh;
-  overflow:auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.paperImg{
-  width:100%;
-  height:auto;
-  display:block;
-  border-radius:14px;
-  border:1px solid rgba(92,66,30,0.18);
-  box-shadow:0 10px 24px rgba(0,0,0,0.14);
-  background:rgba(255,255,255,0.35);
-}
-
-/* Name modal */
-.cardPanel{ padding:18px 16px 20px; }
-
-.title{
-  margin:18px 18px 10px;
-  font-size:26px;
-}
-
-.form{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  padding:0 18px 18px;
-}
-
-.input{
-  flex:1;
-  padding:12px 12px;
-  border-radius:12px;
-  border:1px solid rgba(80,55,25,0.34);
-  font-family:var(--font);
-  font-size:18px;
-  background:rgba(255,255,255,0.76);
-  outline:none;
-}
-
-/* Reply */
-.replyPanel{ background:linear-gradient(180deg, rgb(255,252,246), rgb(244,234,219)); }
-
-.replyFrame{
-  position:relative;
-  padding:18px 16px 22px;
-}
-
-.replyTape{
-  position:absolute;
-  width:150px; height:40px;
-  top:14px; left:18px;
-  transform:rotate(-7deg);
-  border:1px solid rgba(120,90,40,0.22);
-  background:linear-gradient(180deg, rgba(232,216,170,0.72), rgba(204,184,130,0.64));
-  opacity:0.86;
-  z-index:1;
-  pointer-events:none;
-}
-
-.replyStamp{
-  position:absolute;
-  width:74px; height:74px;
-  top:14px; right:16px;
-  border-radius:14px;
-  border:1px dashed rgba(80,55,25,0.42);
-  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), rgba(120,80,30,0.14));
-  z-index:1;
-  pointer-events:none;
-}
-
-.replyStamp::after{
-  content:"THANKS";
-  position:absolute; inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  letter-spacing:0.12em;
-  opacity:0.62;
-}
-
-.replyBody{
-  margin:0 18px 8px;
-  font-size:18px;
-  line-height:1.8;
-  white-space:pre-wrap;
-}
-
-@media (max-width:480px){
-  .title{ font-size:23px; }
-  .btn,.input,.replyBody{ font-size:17px; }
-  .form{ flex-direction:column; align-items:stretch; }
-}
-
-@media (prefers-reduced-motion: reduce){
-  .env-flap,.env-letter,.backdrop,.panel{ transition:none !important; }
-}

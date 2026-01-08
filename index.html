@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>생일 감사 홈페이지</title>
-  <link rel="stylesheet" href="css/style.css?v=10" />
+  <link rel="stylesheet" href="css/style.css?v=12" />
 </head>
 <body>
   <main class="app">
@@ -44,6 +44,7 @@
       <div class="backdrop" data-close="modalName"></div>
       <div class="panel cardPanel" role="dialog" aria-modal="true" aria-label="이름 입력">
         <button class="close" type="button" data-close="modalName" aria-label="닫기">X</button>
+
         <h2 class="title">나에게 도착한 편지</h2>
         <div class="form">
           <input id="nameInput" class="input" placeholder="이름을 입력하세요" autocomplete="off" />
@@ -56,9 +57,11 @@
       <div class="backdrop" data-close="modalReply"></div>
       <div class="panel replyPanel" role="dialog" aria-modal="true" aria-label="개인 답장">
         <button class="close" type="button" data-close="modalReply" aria-label="닫기">X</button>
+
         <div class="replyFrame">
           <div class="replyTape" aria-hidden="true"></div>
           <div class="replyStamp" aria-hidden="true"></div>
+
           <h2 class="title" id="replyTitle"></h2>
           <div class="replyBody" id="replyBody"></div>
         </div>
@@ -66,6 +69,6 @@
     </section>
   </main>
 
-  <script src="js/main.js?v=10"></script>
+  <script src="js/main.js?v=12"></script>
 </body>
 </html>
