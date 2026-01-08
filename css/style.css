@@ -19,14 +19,11 @@
   --paperA: rgb(255, 252, 246);
   --paperB: rgb(244, 234, 219);
 
-  /* 편지지 색 유지 */
   --letter: #E1BF72;
 
-  /* 봉투 색 */
-  --envBack: #FFFFFF;     /* 뒷 배경 */
-  --envFlap: #EDE4D6;     /* 플랩 */
+  --envBack: #FFFFFF;
+  --envFlap: #EDE4D6;
 
-  /* 겉표지 더 연하게(요청) */
   --envCoverTop: rgb(252, 247, 238);
   --envCoverBottom: rgb(244, 235, 222);
 }
@@ -112,11 +109,7 @@ body{ font-family:var(--font); color:var(--ink); }
   box-shadow:0 7px 16px rgba(0,0,0,0.16);
 }
 
-/* =========================
-   Envelope
-   레이어: back < letter < cover < flap
-   ========================= */
-
+/* Envelope */
 .envelope{
   width:min(300px, 74vw);
   aspect-ratio: 4 / 3;
@@ -125,7 +118,6 @@ body{ font-family:var(--font); color:var(--ink); }
   filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
 }
 
-/* back: 완전 흰색 */
 .env-back{
   position:absolute; inset:0;
   border-radius:16px;
@@ -134,7 +126,7 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:1;
 }
 
-/* letter: 봉투 “안”에서 시작하도록 더 아래로 숨김(요청) */
+/* 편지지: 시작 위치를 위로 조정(46% -> 34%) */
 .env-letter{
   position:absolute;
   left:8%; right:8%;
@@ -143,11 +135,8 @@ body{ font-family:var(--font); color:var(--ink); }
   border-radius:12px;
   border:1px solid rgba(92,66,30,0.22);
   background:linear-gradient(180deg, var(--letter), var(--letter));
-
-  /* 핵심: 시작점을 더 아래(봉투 내부)로 */
-  transform: translateY(46%);
+  transform: translateY(34%);
   opacity:0;
-
   transition: transform 620ms ease, opacity 260ms ease;
   pointer-events:none;
   z-index:2;
@@ -161,14 +150,12 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:3;
 }
 
-/* cover는 아래쪽 V 영역만 덮음 */
 .env-cover{
   position:absolute; inset:0;
   border-radius:16px;
   background:transparent;
 }
 
-/* 겉표지 V 더 위로(요청): 12%/54% -> 9%/48% */
 .env-cover::after{
   content:"";
   position:absolute; inset:0;
@@ -184,7 +171,6 @@ body{ font-family:var(--font); color:var(--ink); }
   pointer-events:none;
 }
 
-/* 접힘 음영(겉표지 영역만) */
 .env-cover::before{
   content:"";
   position:absolute; inset:0;
@@ -202,24 +188,23 @@ body{ font-family:var(--font); color:var(--ink); }
   pointer-events:none;
 }
 
-/* flap: 최상단 */
+/* 플랩: 크기 증가(64%->70%), 꼭짓점 더 아래(82%->90%) */
 .env-flap{
   position:absolute;
   left:0; right:0; top:0;
-  height:64%;
+  height:70%;
   transform-origin: 50% 0%;
   transform: rotateX(0deg);
   transition: transform 520ms ease;
   background: var(--envFlap);
   border:1px solid rgba(92,66,30,0.28);
-  clip-path: polygon(0 0, 100% 0, 50% 82%);
+  clip-path: polygon(0 0, 100% 0, 50% 90%);
   border-bottom:none;
   border-radius:16px 16px 0 0;
   pointer-events:none;
   z-index:4;
 }
 
-/* Opening */
 .envelope.is-opening .env-flap{ transform: rotateX(-165deg); }
 .envelope.is-opening .env-letter{
   transform: translateY(-10%);
