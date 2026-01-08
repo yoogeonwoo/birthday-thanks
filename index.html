@@ -7,54 +7,61 @@
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
+  <div class="bg" aria-hidden="true"></div>
 
-<div class="bg"></div>
+  <main class="wrap">
+    <section class="stage">
+      <div class="envelope" id="envelope" aria-hidden="true">
+        <div class="env-back"></div>
 
-<main class="wrap">
+        <div class="env-pocket">
+          <div class="env-letter"></div>
+        </div>
 
-  <!-- 봉투 -->
-  <div class="envelope" id="envelope">
-    <div class="env-back"></div>
+        <div class="env-front"></div>
+        <div class="env-flap"></div>
+      </div>
 
-    <div class="env-pocket">
-      <div class="env-letter"></div>
+      <div class="buttons">
+        <button class="btn btn-primary" id="btnOpenLetter" type="button">편지 읽기</button>
+        <button class="btn btn-secondary" id="btnOpenInbox" type="button">나에게 도착한 편지</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 메인 편지 -->
+  <div class="modal" id="modalLetter" aria-hidden="true">
+    <div class="backdrop" data-close="modalLetter"></div>
+    <button class="close close-paper" data-close="modalLetter" type="button" aria-label="닫기">X</button>
+    <div class="paper-scroll">
+      <img src="./assets/paper.jpg" alt="감사 편지" />
     </div>
-
-    <div class="env-front"></div>
-    <div class="env-flap"></div>
   </div>
 
-  <!-- 버튼 -->
-  <div class="buttons">
-    <button id="btnOpenLetter">편지 읽기</button>
-    <button id="btnOpenInbox">나에게 도착한 편지</button>
+  <!-- 이름 입력 -->
+  <div class="modal" id="modalName" aria-hidden="true">
+    <div class="backdrop" data-close="modalName"></div>
+    <div class="panel">
+      <button class="close" data-close="modalName" type="button" aria-label="닫기">X</button>
+      <h2 class="panel-title">나에게 도착한 편지</h2>
+      <div class="row">
+        <input id="nameInput" class="input" placeholder="이름을 입력하세요" autocomplete="off" />
+        <button class="btn btn-primary small" id="btnCheckName" type="button">확인하기</button>
+      </div>
+    </div>
   </div>
 
-</main>
-
-<!-- 메인 편지 -->
-<div class="modal" id="modalLetter">
-  <button class="close" data-close="modalLetter">X</button>
-  <div class="paper-scroll">
-    <img src="./assets/paper.jpg" alt="편지" />
+  <!-- 개인 답장 -->
+  <div class="modal" id="modalReply" aria-hidden="true">
+    <div class="backdrop" data-close="modalReply"></div>
+    <div class="panel reply">
+      <button class="close" data-close="modalReply" type="button" aria-label="닫기">X</button>
+      <div class="tape" aria-hidden="true"></div>
+      <h2 class="panel-title reply-title" id="replyTitle"></h2>
+      <div class="reply-body" id="replyBody"></div>
+    </div>
   </div>
-</div>
 
-<!-- 이름 입력 -->
-<div class="modal" id="modalName">
-  <button class="close" data-close="modalName">X</button>
-  <h2>나에게 도착한 편지</h2>
-  <input id="nameInput" placeholder="이름을 입력하세요" />
-  <button id="btnCheckName">확인하기</button>
-</div>
-
-<!-- 개인 답장 -->
-<div class="modal" id="modalReply">
-  <button class="close" data-close="modalReply">X</button>
-  <h2 id="replyTitle"></h2>
-  <p id="replyBody"></p>
-</div>
-
-<script src="./js/main.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 </html>
