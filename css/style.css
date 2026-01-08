@@ -114,7 +114,7 @@ body{ font-family:var(--font); color:var(--ink); }
 
 /* =========================
    Envelope
-   - 플랩: 삼각형 "밑변(가장 긴 변)"을 축으로 180도 회전
+   - 플랩: 삼각형 "가장 긴 변(윗변)"을 축으로 180도 회전
    - 겉표지가 플랩을 가리지 않도록: 플랩 z-index 최상단
    - 봉투가 잘라서 숨기지 않도록: envelope overflow visible
    ========================= */
@@ -191,7 +191,7 @@ body{ font-family:var(--font); color:var(--ink); }
   pointer-events:none;
 }
 
-/* 플랩: 밑변(가장 긴 변)을 축으로 180도 회전 */
+/* 플랩: 가장 긴 변(윗변)을 축으로 180도 회전 */
 .env-flap{
   position:absolute;
   left:0; right:0; top:0;
@@ -200,8 +200,8 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:6;
   pointer-events:none;
 
-  /* 핵심: 회전축을 밑변으로 */
-  transform-origin: 50% 100%;
+  /* 핵심: 축을 윗변으로(원래처럼) */
+  transform-origin: 50% 0%;
 
   transform: rotateX(0deg);
   transition: transform 520ms ease;
@@ -236,7 +236,7 @@ body{ font-family:var(--font); color:var(--ink); }
 }
 
 /* Opening */
-.envelope.is-opening .env-flap{ transform: rotateX(180deg); }
+.envelope.is-opening .env-flap{ transform: rotateX(-180deg); }
 .envelope.is-opening .env-letter{
   transform: translateY(-12%);
   opacity:1;
