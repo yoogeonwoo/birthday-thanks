@@ -19,11 +19,14 @@
   --paperA: rgb(255, 252, 246);
   --paperB: rgb(244, 234, 219);
 
+  /* 편지지 */
   --letter: #E1BF72;
 
-  --envBack: #FFFFFF;
-  --envFlap: #EDE4D6;
+  /* 봉투 */
+  --envBack: #FFFFFF;     /* 뒷 배경: 완전 흰색 */
+  --envFlap: #EDE4D6;     /* 플랩 */
 
+  /* 겉표지(연한 톤 유지) */
   --envCoverTop: rgb(252, 247, 238);
   --envCoverBottom: rgb(244, 235, 222);
 }
@@ -109,13 +112,22 @@ body{ font-family:var(--font); color:var(--ink); }
   box-shadow:0 7px 16px rgba(0,0,0,0.16);
 }
 
-/* Envelope */
+/* =========================
+   Envelope
+   레이어: back < letter < cover < flap
+   핵심: letter가 아래에서 보이는 현상은 envelope overflow로 차단
+   ========================= */
+
 .envelope{
   width:min(300px, 74vw);
   aspect-ratio: 4 / 3;
   position:relative;
   perspective: 900px;
   filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
+
+  /* 핵심: 편지지가 “봉투 아래에서 시작해 보이는” 현상 구조적으로 차단 */
+  overflow:hidden;
+  border-radius:16px;
 }
 
 .env-back{
@@ -126,17 +138,21 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:1;
 }
 
-/* 편지지: 시작 위치를 위로 조정(46% -> 34%) */
+/* 편지지: 시작점을 봉투 내부로 더 확실히 올림
+   - bottom을 조금 올리고
+   - translateY도 과도하게 아래로 내리지 않음 */
 .env-letter{
   position:absolute;
   left:8%; right:8%;
-  bottom:10%;
+  bottom:16%;
   height:78%;
   border-radius:12px;
   border:1px solid rgba(92,66,30,0.22);
   background:linear-gradient(180deg, var(--letter), var(--letter));
-  transform: translateY(34%);
+
+  transform: translateY(22%);
   opacity:0;
+
   transition: transform 620ms ease, opacity 260ms ease;
   pointer-events:none;
   z-index:2;
@@ -150,19 +166,23 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:3;
 }
 
+/* 겉표지 */
 .env-cover{
   position:absolute; inset:0;
   border-radius:16px;
   background:transparent;
 }
 
+/* 겉표지 V 라인:
+   - 꼭짓점을 “중앙보다 아주 조금 아래”로 (요청 반영)
+   - 선(양쪽->중앙) 내려오는 느낌을 하단으로 약간 이동 */
 .env-cover::after{
   content:"";
   position:absolute; inset:0;
   background:linear-gradient(180deg, var(--envCoverTop), var(--envCoverBottom));
   clip-path: polygon(
     0 9%,
-    50% 48%,
+    50% 52%,
     100% 9%,
     100% 100%,
     0 100%
@@ -179,7 +199,7 @@ body{ font-family:var(--font); color:var(--ink); }
     linear-gradient(225deg, rgba(92,66,30,0.14), rgba(92,66,30,0) 35%);
   clip-path: polygon(
     0 9%,
-    50% 48%,
+    50% 52%,
     100% 9%,
     100% 100%,
     0 100%
@@ -188,26 +208,37 @@ body{ font-family:var(--font); color:var(--ink); }
   pointer-events:none;
 }
 
-/* 플랩: 크기 증가(64%->70%), 꼭짓점 더 아래(82%->90%) */
+/* 플랩:
+   - 크기 약간 키움
+   - 꼭짓점 각도 더 넓게(덜 뾰족) => 꼭짓점 y를 과도하게 내리지 않음
+   - 대신 flap 자체 높이를 약간 늘려 “덮는 느낌” 유지 */
 .env-flap{
   position:absolute;
   left:0; right:0; top:0;
-  height:70%;
+
+  height:72%;
+
   transform-origin: 50% 0%;
   transform: rotateX(0deg);
   transition: transform 520ms ease;
+
   background: var(--envFlap);
   border:1px solid rgba(92,66,30,0.28);
-  clip-path: polygon(0 0, 100% 0, 50% 90%);
+
+  /* 꼭짓점 y를 90%처럼 극단적으로 내리면 뾰족해지므로,
+     조금 올려서 각도를 넓게(완만하게) */
+  clip-path: polygon(0 0, 100% 0, 50% 78%);
+
   border-bottom:none;
   border-radius:16px 16px 0 0;
   pointer-events:none;
   z-index:4;
 }
 
+/* Opening */
 .envelope.is-opening .env-flap{ transform: rotateX(-165deg); }
 .envelope.is-opening .env-letter{
-  transform: translateY(-10%);
+  transform: translateY(-12%);
   opacity:1;
 }
 
