@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>생일 감사 홈페이지</title>
-  <link rel="stylesheet" href="css/style.css?v=4" />
+  <link rel="stylesheet" href="css/style.css?v=5" />
 </head>
 <body>
   <main class="app">
@@ -13,16 +13,17 @@
 
     <section class="home" aria-label="메인">
       <div class="envelope" id="envelope" aria-hidden="true">
-        <div class="env-back"></div>
+        <div class="env-back" aria-hidden="true"></div>
 
+        <!-- 편지지(애니메이션에서 앞으로 올라오도록 z-index 제어) -->
         <div class="env-letter" aria-hidden="true"></div>
 
+        <!-- 통합 겉표지: 기존 left/right/bottom을 하나로 -->
         <div class="env-front" aria-hidden="true">
-          <div class="env-left"></div>
-          <div class="env-right"></div>
-          <div class="env-bottom"></div>
+          <div class="env-cover" aria-hidden="true"></div>
         </div>
 
+        <!-- 플랩 -->
         <div class="env-flap" aria-hidden="true"></div>
       </div>
 
@@ -72,6 +73,6 @@
     </section>
   </main>
 
-  <script src="js/main.js?v=4"></script>
+  <script src="js/main.js?v=5"></script>
 </body>
 </html>
