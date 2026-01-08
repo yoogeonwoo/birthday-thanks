@@ -19,15 +19,16 @@
   --paperA: rgb(255, 252, 246);
   --paperB: rgb(244, 234, 219);
 
-  /* 편지지 색상: 유지 */
+  /* 편지지 색 유지 */
   --letter: #E1BF72;
 
-  /* 봉투: 요청 반영 */
-  --envBack: #FFFFFF;     /* 뒷 배경: 완전한 흰색 */
+  /* 봉투 색 */
+  --envBack: #FFFFFF;     /* 뒷 배경 */
   --envFlap: #EDE4D6;     /* 플랩 */
-  /* 겉표지: 현상태(연베이지 톤) 유지 */
-  --envCoverTop: rgb(250, 242, 229);
-  --envCoverBottom: rgb(236, 220, 195);
+
+  /* 겉표지 더 연하게(요청) */
+  --envCoverTop: rgb(252, 247, 238);
+  --envCoverBottom: rgb(244, 235, 222);
 }
 
 *{ box-sizing:border-box; }
@@ -133,7 +134,7 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:1;
 }
 
-/* letter: 현재 배치 유지(뒤보다 앞, 겉표지보다 뒤) */
+/* letter: 봉투 “안”에서 시작하도록 더 아래로 숨김(요청) */
 .env-letter{
   position:absolute;
   left:8%; right:8%;
@@ -142,8 +143,11 @@ body{ font-family:var(--font); color:var(--ink); }
   border-radius:12px;
   border:1px solid rgba(92,66,30,0.22);
   background:linear-gradient(180deg, var(--letter), var(--letter));
-  transform: translateY(34%);
+
+  /* 핵심: 시작점을 더 아래(봉투 내부)로 */
+  transform: translateY(46%);
   opacity:0;
+
   transition: transform 620ms ease, opacity 260ms ease;
   pointer-events:none;
   z-index:2;
@@ -164,35 +168,33 @@ body{ font-family:var(--font); color:var(--ink); }
   background:transparent;
 }
 
-/* 핵심: 겉표지 V 라인을 더 위로 올림
-   - 기존보다 시작 y%와 꼭짓점 y%를 낮춰(위로) 덮는 영역을 끌어올림
-   - “플랩 접힘 V”보다 위로 올라오게(더 높은 덮개 느낌) */
+/* 겉표지 V 더 위로(요청): 12%/54% -> 9%/48% */
 .env-cover::after{
   content:"";
   position:absolute; inset:0;
   background:linear-gradient(180deg, var(--envCoverTop), var(--envCoverBottom));
   clip-path: polygon(
-    0 12%,     /* 좌측 시작점(더 위) */
-    50% 54%,   /* V 꼭짓점(더 위) */
-    100% 12%,  /* 우측 시작점(더 위) */
+    0 9%,
+    50% 48%,
+    100% 9%,
     100% 100%,
     0 100%
   );
-  border-top:1px solid rgba(92,66,30,0.22);
+  border-top:1px solid rgba(92,66,30,0.20);
   pointer-events:none;
 }
 
-/* 접힘 음영도 동일하게 같은 영역에만 */
+/* 접힘 음영(겉표지 영역만) */
 .env-cover::before{
   content:"";
   position:absolute; inset:0;
   background:
-    linear-gradient(135deg, rgba(92,66,30,0.18), rgba(92,66,30,0) 35%),
-    linear-gradient(225deg, rgba(92,66,30,0.18), rgba(92,66,30,0) 35%);
+    linear-gradient(135deg, rgba(92,66,30,0.14), rgba(92,66,30,0) 35%),
+    linear-gradient(225deg, rgba(92,66,30,0.14), rgba(92,66,30,0) 35%);
   clip-path: polygon(
-    0 12%,
-    50% 54%,
-    100% 12%,
+    0 9%,
+    50% 48%,
+    100% 9%,
     100% 100%,
     0 100%
   );
@@ -200,7 +202,7 @@ body{ font-family:var(--font); color:var(--ink); }
   pointer-events:none;
 }
 
-/* flap: 최상단 + 색상 #EDE4D6 */
+/* flap: 최상단 */
 .env-flap{
   position:absolute;
   left:0; right:0; top:0;
@@ -209,7 +211,7 @@ body{ font-family:var(--font); color:var(--ink); }
   transform: rotateX(0deg);
   transition: transform 520ms ease;
   background: var(--envFlap);
-  border:1px solid rgba(92,66,30,0.30);
+  border:1px solid rgba(92,66,30,0.28);
   clip-path: polygon(0 0, 100% 0, 50% 82%);
   border-bottom:none;
   border-radius:16px 16px 0 0;
