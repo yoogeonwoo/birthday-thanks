@@ -63,7 +63,7 @@ btnOpenLetter.addEventListener("click", () => {
   window.setTimeout(() => {
     openModal(modalLetter);
     isAnimating = false;
-  }, 620);
+  }, 680);
 });
 
 btnOpenInbox.addEventListener("click", async () => {
@@ -82,10 +82,8 @@ const tryOpenReply = async () => {
   if (!msg) return;
 
   closeModal(modalName);
-
   replyTitle.textContent = `${name}님께`;
   replyBody.textContent = String(msg);
-
   openModal(modalReply);
 };
 
