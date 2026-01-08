@@ -1,342 +1,80 @@
-@font-face{
-  font-family:"GarMa";
-  src:url("../assets/fonts/NanumGarMaYeonGgoc.ttf") format("truetype");
-  font-display:swap;
-}
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>생일 감사 홈페이지</title>
+  <link rel="stylesheet" href="css/style.css?v=5" />
+</head>
+<body>
+  <main class="app">
+    <div class="bg" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
 
-:root{
-  --font: "GarMa","나눔손글씨 가람연꽃","Nanum GarMaYeonGgoc",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    <section class="home" aria-label="메인">
+      <div class="envelope" id="envelope" aria-hidden="true">
+        <div class="env-back"></div>
 
-  --ink: rgba(35, 24, 12, 0.94);
-  --line: rgba(92, 66, 30, 0.30);
-  --shadow: rgba(0,0,0,0.30);
+        <div class="env-letter" aria-hidden="true"></div>
 
-  --btnA: rgba(236, 203, 124, 0.98);
-  --btnB: rgba(214, 178, 98, 0.98);
-  --btnC: rgba(229, 194, 116, 0.98);
-  --btnD: rgba(200, 160, 80, 0.98);
+        <div class="env-front" aria-hidden="true">
+          <div class="env-left"></div>
+          <div class="env-right"></div>
+          <div class="env-bottom"></div>
+        </div>
 
-  --paperA: rgba(255, 252, 246, 0.97);
-  --paperB: rgba(244, 234, 219, 0.97);
-}
+        <div class="env-flap" aria-hidden="true"></div>
+      </div>
 
-*{ box-sizing:border-box; }
-html,body{ height:100%; margin:0; }
-body{ font-family:var(--font); color:var(--ink); }
+      <div class="actions">
+        <button class="btn btn-primary" id="btnOpenLetter" type="button">편지 읽기</button>
+        <button class="btn btn-secondary" id="btnOpenInbox" type="button">나에게 도착한 편지</button>
+      </div>
+    </section>
 
-.app{
-  position:relative;
-  min-height:100vh;
-  overflow:hidden;
-}
+    <!-- 메인 감사 편지: 이미지 뷰어 (패널 흰 배경 제거, X는 바깥쪽) -->
+    <section class="modal" id="modalLetter" aria-hidden="true">
+      <div class="backdrop" data-close="modalLetter"></div>
 
-.bg{
-  position:absolute; inset:0;
-  background:url("../assets/bg.jpg") center/cover no-repeat;
-  transform:scale(1.02);
-  filter:saturate(0.98) contrast(0.98) brightness(0.98);
-  z-index:0;
-}
+      <button class="closeBare closeOutside" type="button" data-close="modalLetter" aria-label="닫기">X</button>
 
-.grain{
-  position:absolute; inset:0;
-  pointer-events:none;
-  opacity:0.14;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 3px),
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 4px);
-  mix-blend-mode:overlay;
-  z-index:1;
-}
+      <div class="paperViewport" role="dialog" aria-modal="true" aria-label="메인 감사 편지">
+        <div class="paperScroll" role="document" aria-label="편지 이미지">
+          <img class="paperImg" src="assets/paper.jpg" alt="감사 편지" />
+        </div>
+      </div>
+    </section>
 
-.home{
-  position:relative;
-  z-index:2;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:18px;
-  padding:24px;
-}
+    <!-- 이름 입력 -->
+    <section class="modal" id="modalName" aria-hidden="true">
+      <div class="backdrop" data-close="modalName"></div>
+      <div class="panel cardPanel" role="dialog" aria-modal="true" aria-label="이름 입력">
+        <button class="close" type="button" data-close="modalName" aria-label="닫기">X</button>
 
-.actions{
-  width:min(360px, 86vw);
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+        <h2 class="title">나에게 도착한 편지</h2>
+        <div class="form">
+          <input id="nameInput" class="input" placeholder="이름을 입력하세요" autocomplete="off" />
+          <button class="btn btn-primary" id="btnCheckName" type="button">확인하기</button>
+        </div>
+      </div>
+    </section>
 
-.btn{
-  width:100%;
-  padding:12px 14px;
-  border-radius:999px;
-  border:1px solid rgba(92,66,30,0.40);
-  cursor:pointer;
-  font-family:var(--font);
-  font-size:18px;
-  letter-spacing:0.02em;
-  color:rgba(20,14,8,0.92);
-  box-shadow:0 10px 20px rgba(0,0,0,0.16);
-  position:relative;
-  overflow:hidden;
-  user-select:none;
-  -webkit-tap-highlight-color: transparent;
-}
+    <!-- 개인 답장 -->
+    <section class="modal" id="modalReply" aria-hidden="true">
+      <div class="backdrop" data-close="modalReply"></div>
+      <div class="panel replyPanel" role="dialog" aria-modal="true" aria-label="개인 답장">
+        <button class="close" type="button" data-close="modalReply" aria-label="닫기">X</button>
 
-.btn::after{
-  content:"";
-  position:absolute; inset:-40%;
-  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28), transparent 58%);
-  opacity:0.75;
-  pointer-events:none;
-}
+        <div class="replyFrame">
+          <div class="replyTape" aria-hidden="true"></div>
 
-.btn-primary{ background:linear-gradient(180deg, var(--btnA), var(--btnB)); }
-.btn-secondary{ background:linear-gradient(180deg, var(--btnC), var(--btnD)); }
+          <h2 class="title replyTitleTop" id="replyTitle"></h2>
+          <div class="replyBody" id="replyBody"></div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-.btn:active{
-  transform: translateY(1px);
-  box-shadow:0 7px 16px rgba(0,0,0,0.16);
-}
-
-/* Envelope */
-.envelope{
-  width:min(300px, 74vw);
-  aspect-ratio: 4 / 3;
-  position:relative;
-  perspective: 900px;
-  filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
-}
-
-.env-back{
-  position:absolute; inset:0;
-  border-radius:16px;
-  border:1px solid var(--line);
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.55), transparent 60%),
-    radial-gradient(circle at 70% 75%, rgba(80,55,25,0.10), transparent 62%),
-    linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,236,220,0.92));
-}
-
-.env-front{
-  position:absolute; inset:0;
-  border-radius:16px;
-  overflow:hidden;
-  pointer-events:none;
-}
-
-.env-left, .env-right{
-  position:absolute;
-  top:22%;
-  width:62%;
-  height:78%;
-  background:linear-gradient(180deg, rgba(250,244,235,0.92), rgba(232,220,205,0.92));
-  border:1px solid rgba(92,66,30,0.22);
-}
-
-.env-left{
-  left:-8%;
-  transform:skewX(-20deg);
-  clip-path: polygon(0 0, 100% 25%, 100% 100%, 0 100%);
-  border-right:none;
-}
-
-.env-right{
-  right:-8%;
-  transform:skewX(20deg);
-  clip-path: polygon(0 25%, 100% 0, 100% 100%, 0 100%);
-  border-left:none;
-}
-
-.env-bottom{
-  position:absolute;
-  left:0; right:0; bottom:0;
-  height:58%;
-  background:linear-gradient(180deg, rgba(248,241,232,0.94), rgba(230,216,198,0.94));
-  border-top:1px solid rgba(92,66,30,0.22);
-  clip-path: polygon(0 22%, 50% 70%, 100% 22%, 100% 100%, 0 100%);
-}
-
-.env-flap{
-  position:absolute;
-  left:0; right:0; top:0;
-  height:64%;
-  transform-origin: 50% 0%;
-  transform: rotateX(0deg);
-  transition: transform 520ms ease;
-  background:linear-gradient(180deg, rgba(246,238,228,0.96), rgba(222,206,186,0.96));
-  border:1px solid rgba(92,66,30,0.24);
-  clip-path: polygon(0 0, 100% 0, 50% 82%);
-  border-bottom:none;
-  border-radius:16px 16px 0 0;
-  pointer-events:none;
-}
-
-.env-letter{
-  position:absolute;
-  left:8%; right:8%;
-  bottom:10%;
-  height:78%;
-  border-radius:12px;
-  border:1px solid rgba(92,66,30,0.18);
-  background:linear-gradient(180deg, rgba(255,252,246,0.94), rgba(244,234,219,0.94));
-  transform: translateY(34%);
-  opacity:0;
-  transition: transform 620ms ease, opacity 260ms ease;
-  pointer-events:none;
-}
-
-.envelope.is-opening .env-flap{ transform: rotateX(-165deg); }
-.envelope.is-opening .env-letter{ transform: translateY(-10%); opacity:1; }
-
-/* Modal */
-.modal{
-  position:fixed; inset:0;
-  display:none;
-  z-index:30;
-}
-
-.modal.is-open{ display:block; }
-
-.backdrop{
-  position:absolute; inset:0;
-  background:rgba(0,0,0,0.50);
-  opacity:0;
-  transition: opacity 220ms ease;
-}
-
-.panel{
-  position:relative;
-  width:min(900px, 94vw);
-  margin:6vh auto 0;
-  border-radius:18px;
-  border:1px solid var(--line);
-  box-shadow:0 18px 44px var(--shadow);
-  overflow:hidden;
-  background:linear-gradient(180deg, var(--paperA), var(--paperB));
-  transform: translateY(8px) scale(0.985);
-  opacity:0;
-  transition: transform 240ms ease, opacity 240ms ease;
-}
-
-.modal.is-open .backdrop{ opacity:1; }
-.modal.is-open .panel{ opacity:1; transform: translateY(0) scale(1); }
-
-.close{
-  position:absolute; top:10px; right:12px;
-  border:1px solid rgba(60,40,15,0.22);
-  background:rgba(255,255,255,0.58);
-  border-radius:10px;
-  cursor:pointer;
-  font-family:var(--font);
-  font-size:16px;
-  padding:6px 10px;
-  z-index:2;
-}
-
-/* Main letter image viewer */
-.paperPanel{ background:linear-gradient(180deg, var(--paperA), var(--paperB)); }
-
-.paperScroll{
-  padding:16px;
-  max-height: 82vh;
-  overflow:auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.paperImg{
-  width:100%;
-  height:auto;
-  display:block;
-  border-radius:14px;
-  border:1px solid rgba(92,66,30,0.18);
-  box-shadow:0 10px 24px rgba(0,0,0,0.14);
-  background:rgba(255,255,255,0.35);
-}
-
-/* Name modal */
-.cardPanel{ padding:18px 16px 20px; }
-
-.title{
-  margin:18px 18px 10px;
-  font-size:26px;
-}
-
-.form{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  padding:0 18px 18px;
-}
-
-.input{
-  flex:1;
-  padding:12px 12px;
-  border-radius:12px;
-  border:1px solid rgba(80,55,25,0.34);
-  font-family:var(--font);
-  font-size:18px;
-  background:rgba(255,255,255,0.76);
-  outline:none;
-}
-
-/* Reply */
-.replyPanel{ background:linear-gradient(180deg, rgba(255,252,246,0.98), rgba(244,234,219,0.98)); }
-
-.replyFrame{
-  position:relative;
-  padding:18px 16px 22px;
-}
-
-.replyTape{
-  position:absolute;
-  width:150px; height:40px;
-  top:14px; left:18px;
-  transform:rotate(-7deg);
-  border:1px solid rgba(120,90,40,0.22);
-  background:linear-gradient(180deg, rgba(232,216,170,0.72), rgba(204,184,130,0.64));
-  opacity:0.86;
-  z-index:1;
-  pointer-events:none;
-}
-
-.replyStamp{
-  position:absolute;
-  width:74px; height:74px;
-  top:14px; right:16px;
-  border-radius:14px;
-  border:1px dashed rgba(80,55,25,0.42);
-  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), rgba(120,80,30,0.14));
-  z-index:1;
-  pointer-events:none;
-}
-
-.replyStamp::after{
-  content:"THANKS";
-  position:absolute; inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  letter-spacing:0.12em;
-  opacity:0.62;
-}
-
-.replyBody{
-  margin:0 18px 8px;
-  font-size:18px;
-  line-height:1.8;
-  white-space:pre-wrap;
-}
-
-@media (max-width:480px){
-  .title{ font-size:23px; }
-  .btn,.input,.replyBody{ font-size:17px; }
-  .form{ flex-direction:column; align-items:stretch; }
-}
-
-@media (prefers-reduced-motion: reduce){
-  .env-flap,.env-letter,.backdrop,.panel{ transition:none !important; }
-}
+  <script src="js/main.js?v=5"></script>
+</body>
+</html>

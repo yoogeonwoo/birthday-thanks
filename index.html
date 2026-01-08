@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>생일 감사 홈페이지</title>
-  <link rel="stylesheet" href="css/style.css?v=4" />
+  <link rel="stylesheet" href="css/style.css?v=5" />
 </head>
 <body>
   <main class="app">
@@ -32,17 +32,20 @@
       </div>
     </section>
 
+    <!-- 메인 감사 편지: 이미지 뷰어 (패널 흰 배경 제거, X는 바깥쪽) -->
     <section class="modal" id="modalLetter" aria-hidden="true">
       <div class="backdrop" data-close="modalLetter"></div>
-      <div class="panel paperPanel" role="dialog" aria-modal="true" aria-label="메인 감사 편지">
-        <button class="close" type="button" data-close="modalLetter" aria-label="닫기">X</button>
 
+      <button class="closeBare closeOutside" type="button" data-close="modalLetter" aria-label="닫기">X</button>
+
+      <div class="paperViewport" role="dialog" aria-modal="true" aria-label="메인 감사 편지">
         <div class="paperScroll" role="document" aria-label="편지 이미지">
           <img class="paperImg" src="assets/paper.jpg" alt="감사 편지" />
         </div>
       </div>
     </section>
 
+    <!-- 이름 입력 -->
     <section class="modal" id="modalName" aria-hidden="true">
       <div class="backdrop" data-close="modalName"></div>
       <div class="panel cardPanel" role="dialog" aria-modal="true" aria-label="이름 입력">
@@ -56,6 +59,7 @@
       </div>
     </section>
 
+    <!-- 개인 답장 -->
     <section class="modal" id="modalReply" aria-hidden="true">
       <div class="backdrop" data-close="modalReply"></div>
       <div class="panel replyPanel" role="dialog" aria-modal="true" aria-label="개인 답장">
@@ -63,15 +67,14 @@
 
         <div class="replyFrame">
           <div class="replyTape" aria-hidden="true"></div>
-          <div class="replyStamp" aria-hidden="true"></div>
 
-          <h2 class="title" id="replyTitle"></h2>
+          <h2 class="title replyTitleTop" id="replyTitle"></h2>
           <div class="replyBody" id="replyBody"></div>
         </div>
       </div>
     </section>
   </main>
 
-  <script src="js/main.js?v=4"></script>
+  <script src="js/main.js?v=5"></script>
 </body>
 </html>
