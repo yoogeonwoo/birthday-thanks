@@ -1,2 +1,2 @@
-# birthday-thanks
+# birthday-thanks-page
 Birthday thank-you page
