@@ -1,94 +1,74 @@
-const $ = (s) => document.querySelector(s);
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>생일 감사 홈페이지</title>
+  <link rel="stylesheet" href="css/style.css?v=13" />
+</head>
+<body>
+  <main class="app">
+    <div class="bg" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
 
-const envelope = $("#envelope");
+    <section class="home" aria-label="메인">
+      <div class="envelope" id="envelope" aria-hidden="true">
+        <div class="env-back" aria-hidden="true"></div>
 
-const modalLetter = $("#modalLetter");
-const modalName = $("#modalName");
-const modalReply = $("#modalReply");
+        <div class="env-letter" aria-hidden="true"></div>
 
-const btnOpenLetter = $("#btnOpenLetter");
-const btnOpenInbox = $("#btnOpenInbox");
-const btnCheckName = $("#btnCheckName");
+        <div class="env-front" aria-hidden="true">
+          <div class="env-cover" aria-hidden="true"></div>
+        </div>
 
-const nameInput = $("#nameInput");
-const replyTitle = $("#replyTitle");
-const replyBody = $("#replyBody");
+        <div class="env-flap" aria-hidden="true"></div>
+      </div>
 
-let repliesCache = null;
-let isAnimating = false;
+      <div class="actions">
+        <button class="btn btn-primary" id="btnOpenLetter" type="button">편지 읽기</button>
+        <button class="btn btn-secondary" id="btnOpenInbox" type="button">나에게 도착한 편지</button>
+      </div>
+    </section>
 
-const openModal = (m) => {
-  m.classList.add("is-open");
-  m.setAttribute("aria-hidden", "false");
-};
+    <!-- 편지 읽기 -->
+    <section class="modal" id="modalLetter" aria-hidden="true">
+      <div class="backdrop" data-close="modalLetter"></div>
+      <div class="panel paperPanel" role="dialog" aria-modal="true" aria-label="메인 감사 편지">
+        <button class="close" type="button" data-close="modalLetter" aria-label="닫기">X</button>
+        <div class="paperScroll" role="document" aria-label="편지 이미지">
+          <img class="paperImg" src="assets/paper.jpg" alt="감사 편지" />
+        </div>
+      </div>
+    </section>
 
-const closeModal = (m) => {
-  m.classList.remove("is-open");
-  m.setAttribute("aria-hidden", "true");
-};
+    <!-- 이름 입력 -->
+    <section class="modal" id="modalName" aria-hidden="true">
+      <div class="backdrop" data-close="modalName"></div>
+      <div class="panel cardPanel" role="dialog" aria-modal="true" aria-label="이름 입력">
+        <button class="close" type="button" data-close="modalName" aria-label="닫기">X</button>
+        <h2 class="title">나에게 도착한 편지</h2>
+        <div class="form">
+          <input id="nameInput" class="input" placeholder="이름을 입력하세요" autocomplete="off" />
+          <button class="btn btn-primary" id="btnCheckName" type="button">확인하기</button>
+        </div>
+      </div>
+    </section>
 
-document.addEventListener("click", (e) => {
-  const key = e.target?.dataset?.close;
-  if (!key) return;
+    <!-- 개인 답장 -->
+    <section class="modal" id="modalReply" aria-hidden="true">
+      <div class="backdrop" data-close="modalReply"></div>
+      <div class="panel replyPanel" role="dialog" aria-modal="true" aria-label="개인 답장">
+        <button class="close" type="button" data-close="modalReply" aria-label="닫기">X</button>
+        <div class="replyFrame">
+          <div class="replyTape" aria-hidden="true"></div>
+          <!-- THANKS 스탬프 오브젝트 삭제 -->
+          <h2 class="title" id="replyTitle"></h2>
+          <div class="replyBody" id="replyBody"></div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  if (key === "modalLetter") {
-    closeModal(modalLetter);
-    envelope.classList.remove("is-opening");
-    isAnimating = false;
-  }
-  if (key === "modalName") closeModal(modalName);
-  if (key === "modalReply") closeModal(modalReply);
-});
-
-const loadReplies = async () => {
-  if (repliesCache) return repliesCache;
-  try {
-    const res = await fetch("data/replies.json", { cache: "no-store" });
-    if (!res.ok) { repliesCache = {}; return repliesCache; }
-    const json = await res.json();
-    repliesCache = (json && typeof json === "object") ? json : {};
-    return repliesCache;
-  } catch {
-    repliesCache = {};
-    return repliesCache;
-  }
-};
-
-btnOpenLetter.addEventListener("click", () => {
-  if (isAnimating) return;
-  isAnimating = true;
-
-  envelope.classList.add("is-opening");
-
-  window.setTimeout(() => {
-    openModal(modalLetter);
-    isAnimating = false;
-  }, 680);
-});
-
-btnOpenInbox.addEventListener("click", async () => {
-  await loadReplies();
-  nameInput.value = "";
-  openModal(modalName);
-  try { nameInput.focus({ preventScroll: true }); } catch {}
-});
-
-const tryOpenReply = async () => {
-  const name = nameInput.value;
-  if (!name) return;
-
-  const data = await loadReplies();
-  const msg = data[name];
-  if (!msg) return;
-
-  closeModal(modalName);
-  replyTitle.textContent = `${name}님께`;
-  replyBody.textContent = String(msg);
-  openModal(modalReply);
-};
-
-btnCheckName.addEventListener("click", () => { void tryOpenReply(); });
-
-nameInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") void tryOpenReply();
-});
+  <script src="js/main.js?v=13"></script>
+</body>
+</html>
