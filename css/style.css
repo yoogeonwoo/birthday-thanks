@@ -19,19 +19,27 @@
   --paperA: rgba(255,252,246,0.97);
   --paperB: rgba(244,234,219,0.97);
 
-  --envRadius: 32px;
+  --env-radius: 34px;
 
-  --envLetter: #E3C788;
+  --env-back-top: #fbf4ea;
+  --env-back-bot: #eadfcd;
 
-  /* 안감/입구면/플랩 밝기 관계:
-     lining(가장 진함) < mouth(진한 흰색) < flap(가장 밝음) */
-  --envLining: #EADFCC;
-  --envMouth:  #F1E9DB;
-  --envFlapTop:#F7F1E7;
-  --envFlapBot:rgba(222,206,186,1);
+  --env-front-top: #f7efe4;
+  --env-front-bot: #e5d6c6;
 
-  /* 편지지 노출량(봉투 밖으로 나오는 비율) */
-  --letterOut: 45%;
+  --env-flap-top: #f7f1e7;
+  --env-flap-bot: #decfbb;
+
+  --env-lining: #eadfcc;
+  --env-mouth:  #f1e9db;
+
+  --letter-color: #E3C788;
+
+  --letter-out: 45%;
+  --letter-side: 6%;
+  --letter-top: 18%;
+  --letter-height: 74%;
+  --letter-start: 34%;
 }
 
 *{ box-sizing:border-box; }
@@ -62,15 +70,18 @@ body{ font-family:var(--font); color:var(--ink); }
 .home{
   position:relative; z-index:2;
   min-height:100vh;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   gap:18px;
   padding:24px;
 }
 
 .actions{
   width:min(360px, 86vw);
-  display:flex; flex-direction:column;
+  display:flex;
+  flex-direction:column;
   gap:10px;
 }
 
@@ -101,52 +112,47 @@ body{ font-family:var(--font); color:var(--ink); }
 .btn-secondary{ background:linear-gradient(180deg, var(--btnC), var(--btnD)); }
 .btn:active{ transform: translateY(1px); box-shadow:0 7px 16px rgba(0,0,0,0.16); }
 
-/* =========================
-   ENVELOPE (Stable)
-   ========================= */
+/* Envelope reset */
 .envelope{
   width:min(360px, 84vw);
-  aspect-ratio:4/3;
+  aspect-ratio: 4 / 3;
   position:relative;
-  perspective:1000px;
-  filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
   isolation:isolate;
+  perspective: 1000px;
+  filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
 }
 
-/* back body */
+/* (1) back */
 .env-back{
-  position:absolute; inset:0;
-  border-radius:var(--envRadius);
-  border:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(252,246,236,1), rgba(236,224,206,1));
+  position:absolute;
+  inset:0;
+  border-radius: var(--env-radius);
+  background: linear-gradient(180deg, var(--env-back-top), var(--env-back-bot));
+  border: 1px solid var(--line);
   z-index:1;
 }
 
-/* inner lining (deeper) */
-.env-inner{
+/* back 내부: 안감 + V로 파인 입구면 */
+.env-back::before{
+  content:"";
   position:absolute;
   left:0; right:0;
   top:18%;
-  height:54%;
-  border-radius:0 0 var(--envRadius) var(--envRadius);
-  background: linear-gradient(180deg, var(--envLining), rgba(234,223,204,0));
-  z-index:2;
-  pointer-events:none;
+  height:56%;
+  background: linear-gradient(180deg, var(--env-lining), rgba(234,223,204,0));
+  border-radius: 0 0 var(--env-radius) var(--env-radius);
+  opacity:0.95;
 }
 
-/* mouth panel with V-notch (visible when flap opens) */
-.env-mouth{
+.env-back::after{
+  content:"";
   position:absolute;
   left:0; right:0;
   top:18%;
-  height:50%;
+  height:52%;
   background:
-    radial-gradient(circle at 50% 10%, rgba(255,255,255,0.28), transparent 58%),
-    linear-gradient(180deg, var(--envMouth), rgba(241,233,219,0));
-  z-index:3;
-  pointer-events:none;
-
-  /* 아래쪽 경계가 V로 파여있는 형태(플랩 열리면 확실히 보임) */
+    radial-gradient(circle at 50% 12%, rgba(255,255,255,0.26), transparent 62%),
+    linear-gradient(180deg, var(--env-mouth), rgba(241,233,219,0));
   clip-path: polygon(
     0 0,
     100% 0,
@@ -156,93 +162,78 @@ body{ font-family:var(--font); color:var(--ink); }
     38% 60%,
     0 60%
   );
-
   box-shadow: inset 0 -1px 0 rgba(92,66,30,0.10);
 }
 
-/* letter mask: 봉투 내부에서만 시작/이동 (아래에서 나타나는 느낌 제거) */
-.env-letterMask{
-  position:absolute;
-  left:0; right:0;
-  top:18%;
-  bottom:0;
-  overflow:hidden;
-  border-radius:0 0 var(--envRadius) var(--envRadius);
-  z-index:4;
-  pointer-events:none;
-}
-
-/* letter: size 조금 작게 */
+/* (4) letter */
 .env-letter{
   position:absolute;
-  left:5%;
-  right:5%;
-  top:6%;
-  height:90%;
-  border-radius:14px;
-  border:1px solid rgba(92,66,30,0.22);
-  background: var(--envLetter);
-  opacity:0;
+  left: var(--letter-side);
+  right: var(--letter-side);
+  top: var(--letter-top);
+  height: var(--letter-height);
+  border-radius: 14px;
+  border: 1px solid rgba(92,66,30,0.22);
+  background: var(--letter-color);
+  z-index:2;
 
-  /* 닫힘: 입구 바로 아래에 숨김(“아래에서 시작” 제거) */
-  transform: translateY(42%);
+  opacity:0;
+  transform: translateY(var(--letter-start));
   transition: transform 860ms ease, opacity 180ms ease;
 }
 
-/* front pocket */
-.env-frontPocket{
+/* (3) front */
+.env-front{
   position:absolute;
   left:0; right:0; bottom:0;
   height:62%;
-  border-radius:0 0 var(--envRadius) var(--envRadius);
-  background:linear-gradient(180deg, rgba(248,241,232,1), rgba(230,216,198,1));
-  border-top:1px solid rgba(92,66,30,0.18);
-  z-index:6;
+  border-radius: 0 0 var(--env-radius) var(--env-radius);
+  background: linear-gradient(180deg, var(--env-front-top), var(--env-front-bot));
+  border: 1px solid var(--line);
+  border-top: 0;
+  z-index:3;
   pointer-events:none;
 }
 
-/* pocket fold V */
-.env-frontPocket::after{
+/* front fold highlight + V */
+.env-front::after{
   content:"";
-  position:absolute; left:0; right:0; top:-1px;
-  height:56%;
-  background:linear-gradient(180deg, rgba(255,255,255,0.08), transparent 70%);
+  position:absolute;
+  left:0; right:0;
+  top:-1px;
+  height:58%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), transparent 70%);
   clip-path: polygon(0 30%, 50% 78%, 100% 30%, 100% 100%, 0 100%);
-  pointer-events:none;
 }
 
-/* flap */
+/* (2) flap */
 .env-flap{
   position:absolute;
   left:0; right:0; top:0;
   height:64%;
-  transform-origin:50% 0%;
+  background: linear-gradient(180deg, var(--env-flap-top), var(--env-flap-bot));
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: var(--env-radius) var(--env-radius) 0 0;
+  clip-path: polygon(0 0, 100% 0, 50% 82%);
+  transform-origin: 50% 0%;
   transform: rotateX(0deg);
   transition: transform 520ms ease;
-  background:linear-gradient(180deg, var(--envFlapTop), var(--envFlapBot));
-  border:1px solid rgba(92,66,30,0.22);
-  border-bottom:none;
-  border-radius:var(--envRadius) var(--envRadius) 0 0;
-  z-index:7;
-  pointer-events:none;
-  clip-path: polygon(0 0, 100% 0, 50% 82%);
+  z-index:4;
   backface-visibility:hidden;
+  pointer-events:none;
 }
 
-/* open */
 .envelope.is-opening .env-flap{
   transform: rotateX(-165deg);
 }
 
-/* open: letter rises “45% only” from its own box */
 .envelope.is-opening .env-letter{
   opacity:1;
-  transform: translateY(calc(-1 * var(--letterOut)));
+  transform: translateY(calc(-1 * var(--letter-out)));
 }
 
-/* =========================
-   MODAL
-   ========================= */
+/* Modal */
 .modal{ position:fixed; inset:0; display:none; z-index:30; }
 .modal.is-open{ display:block; }
 
