@@ -27,11 +27,8 @@
   --envCoverTop: rgb(252, 247, 238);
   --envCoverBottom: rgb(244, 235, 222);
 
-  /* ✅ “뜬 공간” 제거용: 열릴 때 겉표지를 얼마나 아래로 내릴지 */
-  --frontDropOnOpen: 12px;
-
-  /* 플랩 두께는 0으로(떠보임 원인 제거) */
-  --flapThickness: 0px;
+  /* ✅ 여기만 조절하면 “딱 붙음”이 완성됨 (기본 18px) */
+  --flapAttachY: 18px;
 }
 
 *{ box-sizing:border-box; }
@@ -131,7 +128,6 @@ body{ font-family:var(--font); color:var(--ink); }
   overflow: visible;
   border-radius:16px;
 
-  /* ✅ 합성 안정화 */
   isolation:isolate;
 }
 
@@ -160,18 +156,12 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:2;
 }
 
-/* ✅ 겉표지는 “평면 레이어”로 고정해서 3D 뒤틀림 제거 */
 .env-front{
   position:absolute; inset:0;
   border-radius:16px;
   overflow:hidden;
   pointer-events:none;
-
   z-index:3;
-
-  transform: translateZ(0);
-  transform-style: flat;     /* 핵심 */
-  backface-visibility: hidden;
 }
 
 .env-cover{
@@ -200,17 +190,23 @@ body{ font-family:var(--font); color:var(--ink); }
   pointer-events:none;
 }
 
-/* ✅ 플랩은 항상 위 */
+/* =========================
+   ✅ Flap (이번에 끝내는 버전)
+   - 두께/translateZ 없음
+   - 앞/뒷면 같은 평면
+   - 열린 후 아래로 강제 밀착(translateY)
+   ========================= */
+
 .env-flap{
   position:absolute;
   left:0; right:0; top:0;
   height:72%;
-
-  z-index:5;
   pointer-events:none;
 
+  z-index:5; /* 겉표지보다 위 */
+
   transform-origin: 50% 0%;
-  transform: rotateX(0deg);
+  transform: translateY(0) rotateX(0deg);
   transition: transform 520ms ease;
 
   transform-style: preserve-3d;
@@ -220,6 +216,7 @@ body{ font-family:var(--font); color:var(--ink); }
 .flap-face{
   position:absolute;
   inset:0;
+
   background: var(--envFlap);
   border:1px solid rgba(92,66,30,0.28);
   border-bottom:none;
@@ -229,29 +226,27 @@ body{ font-family:var(--font); color:var(--ink); }
   -webkit-backface-visibility:hidden;
 }
 
+/* 닫힘: ▼ */
 .flap-front{
-  transform: translateZ(calc(var(--flapThickness) / 2));
   clip-path: polygon(0 0, 100% 0, 50% 78%);
 }
 
+/* 열림: (뒤집혀도 ▼로 보이도록) ▲ 형태를 넣고, 180도 뒤집어 둠 */
 .flap-back{
-  transform: rotateX(180deg) translateZ(calc(var(--flapThickness) / 2));
   clip-path: polygon(0 78%, 100% 78%, 50% 0);
+  transform: rotateX(180deg);
 }
 
-/* 열기 */
+/* 열기:
+   - rotateX로 접고
+   - translateY로 “봉투에 딱 붙게” 강제 보정 */
 .envelope.is-opening .env-flap{
-  transform: rotateX(-179.95deg);
+  transform: translateY(var(--flapAttachY)) rotateX(-179.95deg);
 }
 
 .envelope.is-opening .env-letter{
   transform: translateY(-12%);
   opacity:1;
-}
-
-/* ✅ 핵심: 열리면 겉표지를 “살짝 아래로” 내려서 공간(착시) 제거 */
-.envelope.is-opening .env-front{
-  transform: translateY(var(--frontDropOnOpen)) translateZ(0);
 }
 
 /* =========================
@@ -391,9 +386,4 @@ body{ font-family:var(--font); color:var(--ink); }
 
 @media (prefers-reduced-motion: reduce){
   .env-flap,.env-letter,.backdrop,.panel{ transition:none !important; }
-}
-/* 플랩이 열리면 봉투 겉표지 V자 삼각형 숨김 */
-.envelope.is-opening .env-cover::after,
-.envelope.is-opening .env-cover::before {
-  opacity: 0;
 }
