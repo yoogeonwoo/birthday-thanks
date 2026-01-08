@@ -13,7 +13,24 @@
     m.setAttribute("aria-hidden", "true");
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
+  const loadRepliesFactory = () => {
+    let cache = null;
+    return async () => {
+      if (cache) return cache;
+      try {
+        const res = await fetch("data/replies.json", { cache: "no-store" });
+        if (!res.ok) { cache = {}; return cache; }
+        const json = await res.json();
+        cache = (json && typeof json === "object") ? json : {};
+        return cache;
+      } catch {
+        cache = {};
+        return cache;
+      }
+    };
+  };
+
+  const init = () => {
     const envelope = $("#envelope");
 
     const modalLetter = $("#modalLetter");
@@ -28,16 +45,26 @@
     const replyTitle = $("#replyTitle");
     const replyBody = $("#replyBody");
 
-    // 안전장치: 요소가 하나라도 없으면 조용히 종료(버튼 무반응 원인 방지)
-    if (!envelope || !modalLetter || !modalName || !modalReply ||
-        !btnOpenLetter || !btnOpenInbox || !btnCheckName ||
-        !nameInput || !replyTitle || !replyBody) {
-      console.error("[INIT] Missing required elements. Check IDs in HTML.");
+    const must = [
+      ["#envelope", envelope],
+      ["#modalLetter", modalLetter],
+      ["#modalName", modalName],
+      ["#modalReply", modalReply],
+      ["#btnOpenLetter", btnOpenLetter],
+      ["#btnOpenInbox", btnOpenInbox],
+      ["#btnCheckName", btnCheckName],
+      ["#nameInput", nameInput],
+      ["#replyTitle", replyTitle],
+      ["#replyBody", replyBody],
+    ];
+    const missing = must.filter(([, el]) => !el).map(([sel]) => sel);
+    if (missing.length) {
+      console.warn("[init] Missing elements:", missing);
       return;
     }
 
-    let repliesCache = null;
     let isAnimating = false;
+    const loadReplies = loadRepliesFactory();
 
     document.addEventListener("click", (e) => {
       const key = e.target?.dataset?.close;
@@ -51,20 +78,6 @@
       if (key === "modalName") closeModal(modalName);
       if (key === "modalReply") closeModal(modalReply);
     });
-
-    const loadReplies = async () => {
-      if (repliesCache) return repliesCache;
-      try {
-        const res = await fetch("data/replies.json", { cache: "no-store" });
-        if (!res.ok) { repliesCache = {}; return repliesCache; }
-        const json = await res.json();
-        repliesCache = (json && typeof json === "object") ? json : {};
-        return repliesCache;
-      } catch {
-        repliesCache = {};
-        return repliesCache;
-      }
-    };
 
     btnOpenLetter.addEventListener("click", () => {
       if (isAnimating) return;
@@ -86,7 +99,7 @@
     });
 
     const tryOpenReply = async () => {
-      const name = nameInput.value.trim();
+      const name = nameInput.value?.trim();
       if (!name) return;
 
       const data = await loadReplies();
@@ -104,8 +117,11 @@
     nameInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") void tryOpenReply();
     });
+  };
 
-    // 디버그 표식(필요 없으면 삭제 가능)
-    console.log("[INIT] main.js loaded and bound.");
-  });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();
