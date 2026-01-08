@@ -392,3 +392,8 @@ body{ font-family:var(--font); color:var(--ink); }
 @media (prefers-reduced-motion: reduce){
   .env-flap,.env-letter,.backdrop,.panel{ transition:none !important; }
 }
+/* 플랩이 열리면 봉투 겉표지 V자 삼각형 숨김 */
+.envelope.is-opening .env-cover::after,
+.envelope.is-opening .env-cover::before {
+  opacity: 0;
+}
