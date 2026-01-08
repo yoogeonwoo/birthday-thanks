@@ -19,19 +19,20 @@
   --paperA: rgb(255, 252, 246);
   --paperB: rgb(244, 234, 219);
 
-  /* 편지지 */
   --letter: #E1BF72;
 
-  /* 봉투 */
   --envBack: #FFFFFF;
   --envFlap: #EDE4D6;
 
-  /* 겉표지 */
   --envCoverTop: rgb(252, 247, 238);
   --envCoverBottom: rgb(244, 235, 222);
 
-  /* 플랩 두께(너무 크면 떠 보임) */
+  /* 플랩 두께 */
   --flapThickness: 0px;
+
+  /* ✅ 3D 합성에서 레이어를 “확정”시키는 Z 깊이 */
+  --zFront: 40px;   /* 플랩(앞) */
+  --zBack: -40px;   /* 겉표지(뒤) */
 }
 
 *{ box-sizing:border-box; }
@@ -132,13 +133,13 @@ body{ font-family:var(--font); color:var(--ink); }
   border-radius:16px;
 }
 
-/* ✅ 레이어: back(1) < letter(2) < front(3) < flap(4) */
 .env-back{
   position:absolute; inset:0;
   border-radius:16px;
   border:1px solid rgba(92,66,30,0.28);
   background: var(--envBack);
   z-index:1;
+  transform: translateZ(-80px); /* 깊이 고정(뒤) */
 }
 
 .env-letter{
@@ -150,7 +151,7 @@ body{ font-family:var(--font); color:var(--ink); }
   border:1px solid rgba(92,66,30,0.22);
   background:linear-gradient(180deg, var(--letter), var(--letter));
 
-  transform: translateY(22%);
+  transform: translateY(22%) translateZ(-20px); /* 겉표지보다도 아래 */
   opacity:0;
 
   transition: transform 620ms ease, opacity 260ms ease;
@@ -158,12 +159,15 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:2;
 }
 
+/* ✅ 겉표지를 Z축으로 “확실히 뒤로” */
 .env-front{
   position:absolute; inset:0;
   border-radius:16px;
   overflow:hidden;
   pointer-events:none;
-  z-index:3; /* ✅ 플랩보다 아래로 고정 */
+  z-index:3;
+  transform: translateZ(var(--zBack));
+  transform-style: preserve-3d;
 }
 
 .env-cover{
@@ -193,7 +197,7 @@ body{ font-family:var(--font); color:var(--ink); }
 }
 
 /* =========================
-   ✅ Flap is ALWAYS on top
+   Flap (항상 “위”)
    ========================= */
 
 .env-flap{
@@ -201,11 +205,12 @@ body{ font-family:var(--font); color:var(--ink); }
   left:0; right:0; top:0;
   height:72%;
 
-  z-index:4; /* ✅ 항상 최상단 */
+  z-index:10;
   pointer-events:none;
 
   transform-origin: 50% 0%;
-  transform: rotateX(0deg);
+  /* ✅ 플랩 자체를 Z축으로 “앞”에 고정 */
+  transform: translateZ(var(--zFront)) rotateX(0deg);
   transition: transform 520ms ease;
 
   transform-style: preserve-3d;
@@ -225,22 +230,22 @@ body{ font-family:var(--font); color:var(--ink); }
   -webkit-backface-visibility:hidden;
 }
 
-/* 닫힘: ▲ */
 .flap-front{
   transform: translateZ(calc(var(--flapThickness) / 2));
   clip-path: polygon(0 0, 100% 0, 50% 78%);
 }
 
-/* 열림에서도 ▲ */
 .flap-back{
   transform: rotateX(180deg) translateZ(calc(var(--flapThickness) / 2));
   clip-path: polygon(0 78%, 100% 78%, 50% 0);
 }
 
 /* Opening */
-.envelope.is-opening .env-flap{ transform: rotateX(-179.95deg); }
+.envelope.is-opening .env-flap{
+  transform: translateZ(var(--zFront)) rotateX(-179.95deg);
+}
 .envelope.is-opening .env-letter{
-  transform: translateY(-12%);
+  transform: translateY(-12%) translateZ(-20px);
   opacity:1;
 }
 
@@ -291,6 +296,7 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:2;
 }
 
+/* 편지 읽기: 뒤 흰 배경 제거 */
 #modalLetter .paperPanel{
   background: transparent;
   border: none;
@@ -315,6 +321,7 @@ body{ font-family:var(--font); color:var(--ink); }
   background:rgba(255,255,255,0.35);
 }
 
+/* Name modal */
 .cardPanel{ padding:18px 16px 20px; }
 
 .title{
@@ -340,6 +347,7 @@ body{ font-family:var(--font); color:var(--ink); }
   outline:none;
 }
 
+/* Reply */
 .replyPanel{ background:linear-gradient(180deg, rgb(255,252,246), rgb(244,234,219)); }
 
 .replyFrame{
