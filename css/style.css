@@ -19,11 +19,14 @@
   --paperA: rgb(255, 252, 246);
   --paperB: rgb(244, 234, 219);
 
+  /* 편지지 */
   --letter: #E1BF72;
 
+  /* 봉투 */
   --envBack: #FFFFFF;
   --envFlap: #EDE4D6;
 
+  /* 겉표지 */
   --envCoverTop: rgb(252, 247, 238);
   --envCoverBottom: rgb(244, 235, 222);
 }
@@ -110,18 +113,21 @@ body{ font-family:var(--font); color:var(--ink); }
 }
 
 /* =========================
-   Envelope: 플랩 180도 오픈 + 열린 상태 유지 + 절대 가려지지 않게
+   Envelope
+   - 플랩: 삼각형 "밑변(가장 긴 변)"을 축으로 180도 회전
+   - 겉표지가 플랩을 가리지 않도록: 플랩 z-index 최상단
+   - 봉투가 잘라서 숨기지 않도록: envelope overflow visible
    ========================= */
 
 .envelope{
   width:min(300px, 74vw);
   aspect-ratio: 4 / 3;
   position:relative;
+
   perspective: 900px;
   transform-style: preserve-3d;
-  filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
 
-  /* 플랩/편지지가 바깥으로 나와도 잘리지 않게 */
+  filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
   overflow: visible;
   border-radius:16px;
 }
@@ -151,11 +157,10 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:2;
 }
 
-/* 겉표지는 “봉투 모양 표현”만. 플랩을 덮지 않도록 플랩보다 아래 */
 .env-front{
   position:absolute; inset:0;
   border-radius:16px;
-  overflow:hidden;          /* 앞면 모양 유지용 */
+  overflow:hidden;
   pointer-events:none;
   z-index:3;
 }
@@ -170,13 +175,7 @@ body{ font-family:var(--font); color:var(--ink); }
   content:"";
   position:absolute; inset:0;
   background:linear-gradient(180deg, var(--envCoverTop), var(--envCoverBottom));
-  clip-path: polygon(
-    0 9%,
-    50% 52%,
-    100% 9%,
-    100% 100%,
-    0 100%
-  );
+  clip-path: polygon(0 9%, 50% 52%, 100% 9%, 100% 100%, 0 100%);
   border-top:1px solid rgba(92,66,30,0.20);
   pointer-events:none;
 }
@@ -187,26 +186,23 @@ body{ font-family:var(--font); color:var(--ink); }
   background:
     linear-gradient(135deg, rgba(92,66,30,0.14), rgba(92,66,30,0) 35%),
     linear-gradient(225deg, rgba(92,66,30,0.14), rgba(92,66,30,0) 35%);
-  clip-path: polygon(
-    0 9%,
-    50% 52%,
-    100% 9%,
-    100% 100%,
-    0 100%
-  );
+  clip-path: polygon(0 9%, 50% 52%, 100% 9%, 100% 100%, 0 100%);
   opacity:0.55;
   pointer-events:none;
 }
 
-/* 플랩은 항상 최상단 */
+/* 플랩: 밑변(가장 긴 변)을 축으로 180도 회전 */
 .env-flap{
   position:absolute;
   left:0; right:0; top:0;
   height:72%;
-  z-index:10;
+
+  z-index:6;
   pointer-events:none;
 
-  transform-origin: 50% 0%;
+  /* 핵심: 회전축을 밑변으로 */
+  transform-origin: 50% 100%;
+
   transform: rotateX(0deg);
   transition: transform 520ms ease;
 
@@ -214,7 +210,7 @@ body{ font-family:var(--font); color:var(--ink); }
   will-change: transform;
 }
 
-/* 플랩 “앞면” */
+/* 플랩 앞면(닫힌 상태에서 보이는 면) */
 .env-flap::before{
   content:"";
   position:absolute; inset:0;
@@ -226,7 +222,7 @@ body{ font-family:var(--font); color:var(--ink); }
   backface-visibility: hidden;
 }
 
-/* 플랩 “뒷면” — 180도 접힌 후 이 면이 보이게 */
+/* 플랩 뒷면(열렸을 때 보이는 면) */
 .env-flap::after{
   content:"";
   position:absolute; inset:0;
@@ -240,7 +236,7 @@ body{ font-family:var(--font); color:var(--ink); }
 }
 
 /* Opening */
-.envelope.is-opening .env-flap{ transform: rotateX(-180deg); }
+.envelope.is-opening .env-flap{ transform: rotateX(180deg); }
 .envelope.is-opening .env-letter{
   transform: translateY(-12%);
   opacity:1;
@@ -294,7 +290,7 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:2;
 }
 
-/* 편지 읽기: 패널 흰 배경 제거 */
+/* 편지 읽기: 뒤 흰 배경 제거 */
 #modalLetter .paperPanel{
   background: transparent;
   border: none;
