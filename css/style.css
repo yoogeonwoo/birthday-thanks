@@ -19,16 +19,19 @@
   --paperA: rgb(255, 252, 246);
   --paperB: rgb(244, 234, 219);
 
+  /* 편지지 */
   --letter: #E1BF72;
 
+  /* 봉투 */
   --envBack: #FFFFFF;
   --envFlap: #EDE4D6;
 
+  /* 겉표지 */
   --envCoverTop: rgb(252, 247, 238);
   --envCoverBottom: rgb(244, 235, 222);
 
-  /* 3D 플랩 두께(미세값, 색상/위치 변화 없이 “입체 분리”만) */
-  --flapThickness: 1.2px;
+  /* 3D 플랩 두께(작게 유지) */
+  --flapThickness: 2px;
 }
 
 *{ box-sizing:border-box; }
@@ -162,6 +165,7 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:3;
 }
 
+/* 겉표지 */
 .env-cover{
   position:absolute; inset:0;
   border-radius:16px;
@@ -189,9 +193,9 @@ body{ font-family:var(--font); color:var(--ink); }
 }
 
 /* =========================
-   3D Flap (핵심)
-   - 앞면/뒷면을 "서로 다른 Z"로 분리해서 실제 3D처럼 회전
-   - 180도 회전 후에도 삼각형 방향이 “역삼각형”으로 인식되지 않도록
+   ✅ 3D Flap (열려도 ▲ 유지)
+   - 회전축: 가장 긴 변(윗변)
+   - 뒷면: "미리 뒤집힌 삼각형"을 넣어서 열렸을 때 ▲로 보이게 함
    ========================= */
 
 .env-flap{
@@ -202,9 +206,7 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:6;
   pointer-events:none;
 
-  /* 경첩은 윗변 */
   transform-origin: 50% 0%;
-
   transform: rotateX(0deg);
   transition: transform 520ms ease;
 
@@ -222,26 +224,25 @@ body{ font-family:var(--font); color:var(--ink); }
   border-bottom:none;
   border-radius:16px 16px 0 0;
 
-  clip-path: polygon(0 0, 100% 0, 50% 78%);
-  backface-visibility: hidden;
+  backface-visibility:hidden;
 }
 
-/* 앞면: 카메라 쪽 */
+/* 앞면(닫힘): ▲ */
 .flap-front{
   transform: translateZ(calc(var(--flapThickness) / 2));
+  clip-path: polygon(0 0, 100% 0, 50% 78%);
 }
 
-/* 뒷면: 반대쪽을 향하게 세팅 */
+/* 뒷면(열림): ✅ 열렸을 때도 ▲로 보이도록 "반전 삼각형"을 사용
+   - 면 자체는 뒤를 보게 rotateX(180)
+   - clip-path는 꼭짓점이 위로 오도록 반전 배치 */
 .flap-back{
   transform: rotateX(180deg) translateZ(calc(var(--flapThickness) / 2));
+  clip-path: polygon(0 78%, 100% 78%, 50% 0);
 }
 
-/* 열기: 180도 접혀 열린 상태 유지 */
-.envelope.is-opening .env-flap{
-  transform: rotateX(-180deg);
-}
-
-/* 편지지 등장 */
+/* Opening */
+.envelope.is-opening .env-flap{ transform: rotateX(-180deg); }
 .envelope.is-opening .env-letter{
   transform: translateY(-12%);
   opacity:1;
@@ -282,7 +283,7 @@ body{ font-family:var(--font); color:var(--ink); }
 .modal.is-open .backdrop{ opacity:1; }
 .modal.is-open .panel{ opacity:1; transform: translateY(0) scale(1); }
 
-/* X 버튼(원래 스타일) */
+/* X 버튼 */
 .close{
   position:absolute; top:10px; right:12px;
   border:1px solid rgba(60,40,15,0.22);
@@ -366,7 +367,7 @@ body{ font-family:var(--font); color:var(--ink); }
   pointer-events:none;
 }
 
-/* '~님께'가 테이프보다 앞으로 */
+/* 제목이 테이프보다 앞으로 */
 .replyFrame .title{
   position:relative;
   z-index:3;
