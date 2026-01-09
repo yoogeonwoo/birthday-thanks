@@ -21,7 +21,6 @@
           <div class="env-cover" aria-hidden="true"></div>
         </div>
 
-        <!-- ✅ 플랩: 3D 두께 제거(한 평면), 앞/뒷면만 교체 -->
         <div class="env-flap" aria-hidden="true">
           <div class="flap-face flap-front" aria-hidden="true"></div>
           <div class="flap-face flap-back" aria-hidden="true"></div>
@@ -64,15 +63,11 @@
       <div class="panel replyPanel" role="dialog" aria-modal="true" aria-label="개인 답장">
         <button class="close" type="button" data-close="modalReply" aria-label="닫기">X</button>
 
-        <!-- ✅ 추가: 스크롤 버튼(위/아래) -->
-        <button class="scrollBtn scrollUp" id="replyScrollUp" type="button" aria-label="위로 스크롤">▲</button>
-        <button class="scrollBtn scrollDown" id="replyScrollDown" type="button" aria-label="아래로 스크롤">▼</button>
-
         <div class="replyFrame">
           <div class="replyTape" aria-hidden="true"></div>
           <h2 class="title" id="replyTitle"></h2>
 
-          <!-- ✅ 추가: 답장 본문 스크롤 컨테이너 -->
+          <!-- ✅ 추가: 답장 본문 스크롤 컨테이너(터치/휠 스크롤) -->
           <div class="replyScroll" id="replyScroll" role="document" aria-label="답장 본문">
             <div class="replyBody" id="replyBody"></div>
           </div>
