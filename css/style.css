@@ -30,15 +30,15 @@
   /* 플랩 밀착 */
   --flapAttachY: 34px;
 
-  /* 편지지 상승량(3D Z 사용 금지: 크기 왜곡 방지) */
+  /* 편지지 상승량(3D Z 사용 금지) */
   --letterLift: -45%;
 
-  /* ===== 플랩(이미지처럼) 라인/띠 ===== */
-  --flapLine: rgba(0,0,0,0.92);
+  /* ===== 플랩 라인 색상: 플랩과 동일 ===== */
+  --flapLine: var(--envFlap);
   --flapLineW: 2px;
-  --flapBandH: 34px;          /* 상단 얇은 띠 높이 */
-  --flapApexY: 74%;           /* V자 꼭짓점 Y */
-  --flapSideY: 30%;           /* 좌/우가 내려오는 Y (띠 아래) */
+  --flapBandH: 34px;
+  --flapApexY: 74%;
+  --flapSideY: 30%;
 }
 
 *{ box-sizing:border-box; }
@@ -131,7 +131,6 @@ body{ font-family:var(--font); color:var(--ink); }
   aspect-ratio: 4 / 3;
   position:relative;
 
-  /* ✅ 왜곡 완화(플랩 회전 시 과도한 확대 방지) */
   perspective: 1600px;
   perspective-origin: 50% 35%;
   transform-style: preserve-3d;
@@ -151,7 +150,6 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:1;
 }
 
-/* ✅ 편지지: translateZ 제거(겉표지 덮는 현상 방지) */
 .env-letter{
   position:absolute;
   left:8%; right:8%;
@@ -167,7 +165,6 @@ body{ font-family:var(--font); color:var(--ink); }
   transition: transform 700ms ease, opacity 260ms ease;
   pointer-events:none;
 
-  /* env-front(3) 아래 */
   z-index:2;
   will-change: transform, opacity;
 }
@@ -177,12 +174,7 @@ body{ font-family:var(--font); color:var(--ink); }
   border-radius:16px;
   overflow:hidden;
   pointer-events:none;
-
-  /* 겉표지는 항상 편지지 위 */
   z-index:3;
-
-  /* translateZ 금지 */
-  transform:none;
 }
 
 .env-cover{
@@ -212,7 +204,7 @@ body{ font-family:var(--font); color:var(--ink); }
 }
 
 /* =========================
-   Flap (이미지처럼: 얇은 띠 + V자 라인)
+   Flap
    ========================= */
 
 .env-flap{
@@ -220,7 +212,6 @@ body{ font-family:var(--font); color:var(--ink); }
   left:0; right:0; top:0;
   height:72%;
   pointer-events:none;
-
   z-index:4;
 
   transform-origin: 50% 0%;
@@ -234,22 +225,19 @@ body{ font-family:var(--font); color:var(--ink); }
 .flap-face{
   position:absolute;
   inset:0;
-
-  /* 기본 바탕 */
-  background: var(--envFlap);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.40), rgba(255,255,255,0.05)),
+    var(--envFlap);
   border:1px solid rgba(92,66,30,0.28);
   border-bottom:none;
   border-radius:16px 16px 0 0;
 
   backface-visibility:hidden;
   -webkit-backface-visibility:hidden;
-
-  overflow:hidden; /* 라인/그라데이션이 모서리를 넘지 않게 */
+  overflow:hidden;
 }
 
-/* ✅ 닫힌 상태에서 보이는 “앞면” 플랩 모양: 상단 띠 + 아래 V자 형태 */
 .flap-front{
-  /* 상단 띠(직사각) + 아래 V자(오각형) */
   clip-path: polygon(
     0 0,
     100% 0,
@@ -259,7 +247,6 @@ body{ font-family:var(--font); color:var(--ink); }
   );
 }
 
-/* ✅ 뒤면은 기존처럼 유지(열림 시 뒷면 표시) */
 .flap-back{
   clip-path: polygon(
     0 var(--flapApexY),
@@ -269,66 +256,28 @@ body{ font-family:var(--font); color:var(--ink); }
   transform: rotateX(180deg);
 }
 
-/* ===== 라인(검정선): 상단 가로선 + V자 접힘선 2개 =====
-   - 플랩 앞면에만 그림(닫힘 상태에서 이미지처럼)
-*/
 .flap-front::before{
   content:"";
   position:absolute;
   inset:0;
   pointer-events:none;
-
-  /* 1) 상단 가로선(띠 아래 라인)
-     2) V자 좌측 라인
-     3) V자 우측 라인
-     선 두께는 background-size로 제어
-  */
   background:
-    /* 상단 가로선 */
-    linear-gradient(var(--flapLine), var(--flapLine)) 0 calc(var(--flapBandH)) / 100% var(--flapLineW) no-repeat,
-
-    /* 왼쪽 대각선 */
-    linear-gradient(
-      135deg,
-      transparent calc(50% - (var(--flapLineW) / 2)),
-      var(--flapLine) 50%,
-      transparent calc(50% + (var(--flapLineW) / 2))
-    ) 0 0 / 100% 100% no-repeat,
-
-    /* 오른쪽 대각선 */
-    linear-gradient(
-      225deg,
-      transparent calc(50% - (var(--flapLineW) / 2)),
-      var(--flapLine) 50%,
-      transparent calc(50% + (var(--flapLineW) / 2))
-    ) 0 0 / 100% 100% no-repeat;
-  opacity:1;
+    linear-gradient(var(--flapLine), var(--flapLine)) 0 var(--flapBandH) / 100% var(--flapLineW) no-repeat,
+    linear-gradient(135deg, transparent 49%, var(--flapLine) 50%, transparent 51%) 0 0 / 100% 100% no-repeat,
+    linear-gradient(225deg, transparent 49%, var(--flapLine) 50%, transparent 51%) 0 0 / 100% 100% no-repeat;
 }
 
-/* ✅ 플랩 상단 띠 “형태”를 더 또렷하게(밝은 띠) */
 .flap-front::after{
   content:"";
   position:absolute;
   left:0; right:0; top:0;
   height:var(--flapBandH);
   pointer-events:none;
-
   background: rgba(255,255,255,0.55);
   border-bottom: var(--flapLineW) solid var(--flapLine);
   opacity:0.45;
 }
 
-/* 플랩 내부에 약간의 종이 결/그라데이션(선택적) */
-.flap-face{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.40), rgba(255,255,255,0.05)),
-    var(--envFlap);
-}
-
-/* ✅ 열기 상태:
-   - 플랩은 열리되, z-index를 뒤로 보내서 편지지를 절대 가리지 않음
-   - translateZ 사용 안 함(크기 왜곡 방지)
-*/
 .envelope.is-opening .env-flap{
   transform: translateY(var(--flapAttachY)) rotateX(-179.95deg);
   z-index:0;
@@ -386,7 +335,6 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:2;
 }
 
-/* 편지 읽기: 뒤 흰 배경 제거 */
 #modalLetter .paperPanel{
   background: transparent;
   border: none;
