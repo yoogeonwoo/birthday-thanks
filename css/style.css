@@ -30,11 +30,8 @@
   /* 플랩 밀착 */
   --flapAttachY: 34px;
 
-  /* 편지지를 3D에서 앞으로 당기는 깊이 */
-  --letterZ: 60px;
-
-  /* ✅ 추가: 플랩을 열렸을 때 Z축으로 뒤로 보내기(플랩이 편지지를 덮지 않게) */
-  --flapOpenZ: -120px;
+  /* 편지지 상승량(3D Z 사용 금지) */
+  --letterLift: -45%;
 }
 
 *{ box-sizing:border-box; }
@@ -127,7 +124,9 @@ body{ font-family:var(--font); color:var(--ink); }
   aspect-ratio: 4 / 3;
   position:relative;
 
-  perspective: 900px;
+  /* ✅ 왜곡 완화 */
+  perspective: 1600px;
+  perspective-origin: 50% 35%;
   transform-style: preserve-3d;
 
   filter: drop-shadow(0 14px 30px rgba(0,0,0,0.22));
@@ -145,7 +144,7 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:1;
 }
 
-/* ✅ 편지지: 앞으로(+) 올라오게 */
+/* ✅ 편지지: translateZ 제거(겉표지 덮는 현상 방지) */
 .env-letter{
   position:absolute;
   left:8%; right:8%;
@@ -155,16 +154,14 @@ body{ font-family:var(--font); color:var(--ink); }
   border:1px solid rgba(92,66,30,0.22);
   background:linear-gradient(180deg, var(--letter), var(--letter));
 
-  transform: translateY(22%) translateZ(0px);
+  transform: translateY(22%);
   opacity:0;
 
   transition: transform 700ms ease, opacity 260ms ease;
   pointer-events:none;
 
-  /* z-index는 보조, 3D에서는 translateZ가 우선될 수 있음 */
-  z-index:6;
-
-  transform-style: preserve-3d;
+  /* env-front(3) 아래 */
+  z-index:2;
   will-change: transform, opacity;
 }
 
@@ -173,7 +170,12 @@ body{ font-family:var(--font); color:var(--ink); }
   border-radius:16px;
   overflow:hidden;
   pointer-events:none;
+
+  /* 겉표지는 항상 편지지 위 */
   z-index:3;
+
+  /* ✅ translateZ 금지 */
+  transform:none;
 }
 
 .env-cover{
@@ -244,15 +246,17 @@ body{ font-family:var(--font); color:var(--ink); }
   transform: rotateX(180deg);
 }
 
-/* ✅ 열기:
-   - 플랩은 밀착 + 뒤로 접힘 + Z축으로 뒤로 이동(가림 방지)
-   - 편지지는 translateZ(+)로 앞으로 */
+/* ✅ 열기 상태:
+   - 플랩은 열리되, z-index를 뒤로 보내서 편지지를 절대 가리지 않음
+   - 플랩 translateZ 제거(커지는 투영 현상 방지)
+   - 편지지는 위로만 이동 */
 .envelope.is-opening .env-flap{
-  transform: translateY(var(--flapAttachY)) rotateX(-179.95deg) translateZ(var(--flapOpenZ));
+  transform: translateY(var(--flapAttachY)) rotateX(-179.95deg);
+  z-index:0;
 }
 
 .envelope.is-opening .env-letter{
-  transform: translateY(-45%) translateZ(var(--letterZ));
+  transform: translateY(var(--letterLift));
   opacity:1;
 }
 
