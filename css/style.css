@@ -34,9 +34,9 @@
   --letterLift: -45%;
 
   /* 플랩 형태 파라미터 */
-  --flapBandH: 34px;     /* 상단 얇은 띠 높이 */
-  --flapApexY: 74%;      /* V자 꼭짓점 Y */
-  --flapSideY: 30%;      /* 좌/우 내려오는 Y */
+  --flapBandH: 34px;
+  --flapApexY: 74%;
+  --flapSideY: 30%;
 }
 
 *{ box-sizing:border-box; }
@@ -258,7 +258,7 @@ body{ font-family:var(--font); color:var(--ink); }
   transform: rotateX(180deg);
 }
 
-/* 검정선(대각선/가로선) 제거(현재 생성 요소 없음 유지) */
+/* 검정선(대각선/가로선) 제거 유지 */
 .flap-front::before,
 .flap-front::after{
   display:none !important;
@@ -399,7 +399,24 @@ body{ font-family:var(--font); color:var(--ink); }
   z-index:3;
 }
 
-/* 기존 replyBody는 그대로 두고, 스크롤은 상위 컨테이너(replyScroll)가 담당 */
+/* ✅ 핵심: 개인 답장 본문 스크롤 */
+.replyScroll{
+  margin:0 18px 8px;
+  padding-right:6px; /* 스크롤바 공간 */
+  max-height: calc(82vh - 170px);
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* replyScroll 내부에서는 replyBody margin 제거 */
+.replyScroll .replyBody{
+  margin:0;
+  font-size:18px;
+  line-height:1.8;
+  white-space:pre-wrap;
+}
+
+/* 기존 replyBody 정의는 유지(호환), 단 replyScroll 내부가 우선 */
 .replyBody{
   margin:0 18px 8px;
   font-size:18px;
@@ -407,58 +424,6 @@ body{ font-family:var(--font); color:var(--ink); }
   white-space:pre-wrap;
 }
 
-/* =========================
-   ✅ 추가: 개인 답장 스크롤 + 스크롤 버튼
-   ========================= */
-
-/* 답장 스크롤 컨테이너 */
-.replyScroll{
-  margin:0 18px 8px;
-  padding-right:6px; /* 스크롤바 공간 */
-  max-height: calc(82vh - 170px); /* 타이틀/패딩/닫기버튼 고려 */
-  overflow:auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* replyScroll 안에서 replyBody는 margin이 겹치지 않게 */
-.replyScroll .replyBody{
-  margin:0;
-}
-
-/* 스크롤 버튼(위/아래) */
-.scrollBtn{
-  position:absolute;
-  right:12px;
-  width:40px;
-  height:40px;
-  border-radius:999px;
-  border:1px solid rgba(60,40,15,0.22);
-  background:rgba(255,255,255,0.72);
-  box-shadow:0 10px 22px rgba(0,0,0,0.18);
-  cursor:pointer;
-  font-family:var(--font);
-  font-size:18px;
-  line-height:1;
-  z-index:5;
-  user-select:none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.scrollBtn:active{
-  transform: translateY(1px);
-  box-shadow:0 7px 16px rgba(0,0,0,0.16);
-}
-
-.scrollUp{ top:58px; }   /* 닫기 버튼 아래 */
-.scrollDown{ bottom:14px; }
-
-.scrollBtn[disabled]{
-  opacity:0.35;
-  cursor:default;
-  box-shadow:none;
-}
-
-/* 모바일에서 높이 여유 조금 더 */
 @media (max-width:480px){
   .title{ font-size:23px; }
   .btn,.input,.replyBody{ font-size:17px; }
@@ -468,9 +433,7 @@ body{ font-family:var(--font); color:var(--ink); }
     max-height: calc(82vh - 155px);
   }
 
-  .scrollBtn{
-    width:38px;
-    height:38px;
+  .replyScroll .replyBody{
     font-size:17px;
   }
 }
